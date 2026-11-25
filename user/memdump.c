@@ -61,5 +61,68 @@ void
 memdump(char *fmt, char *data, int len)
 {
   // Your code here.  `data` holds `len` valid bytes.
-
+  int fmt_len = strlen(fmt);
+  int cur_len = 0;
+  for (int i = 0; i < fmt_len; i++) {
+    switch (fmt[i]) {
+      case 'i':
+        if (cur_len + 4 > len) {
+          printf("memdump: not enough data for '%c'\n", fmt[i]);
+          return;
+        }
+        cur_len += 4;
+        printf("%d\n", *((int*)data));
+        data = data + 4;
+        break;
+      case 'p':
+        if (cur_len + 8 > len) {
+          printf("memdump: not enough data for '%c'\n", fmt[i]);
+          return;
+        }
+        cur_len += 8;
+        printf("%lx\n", *((uint64 *)data));
+        data = data + 8;
+        break;
+      case 'h':
+        if (cur_len + 2 > len) {
+          printf("memdump: not enough data for '%c'\n", fmt[i]);
+          return;
+        }
+        cur_len += 2;
+        int x = (int)(*(uint16 *)(data));
+        printf("%d\n", x);
+        data = data + 2;
+        break;
+      case 'c':
+        if (cur_len + 1 > len) {
+          printf("memdump: not enough data for '%c'\n", fmt[i]);
+          return;
+        }
+        cur_len += 1;
+        printf("%c\n", *data);
+        data = data + 1;
+        break;
+      case 's':
+        if (cur_len + 8 > len) {
+          printf("memdump: not enough data for '%c'\n", fmt[i]);
+          return;
+        }
+        cur_len += 8;
+        char *str = (char *)(*((uint64 *)data));
+        printf("%s\n", str);
+        data = data + 8;
+        break;
+      case 'S':
+        printf("%s\n", data);
+        if (cur_len + strlen(data) + 1 > len) {
+          printf("memdump: not enough data for '%c'\n", fmt[i]);
+          return;
+        }
+        cur_len += strlen(data) + 1;
+        data = data + strlen(data) + 1;
+        break;
+      default:
+        printf("default case\n");
+    }
+  }
 }
